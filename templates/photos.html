@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Photographies - Site Astronomie{% endblock %}
+
+{% block content %}
+<h2>🌌 Photographies Astronomiques</h2>
+<p>Admirez les plus belles photographies de notre communauté.</p>
+
+{% if photographs %}
+    <div class="row">
+        {% for photo in photographs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ photo.title }}</h5>
+                        {% if photo.description %}
+                            <p class="card-text">{{ photo.description }}</p>
+                        {% endif %}
+                        <p class="text-muted small">
+                            {% if photo.user %}
+                                Par {{ photo.user.username }}
+                            {% endif %}
+                            <br>
+                            {{ photo.created_at.strftime('%d/%m/%Y') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">Aucune photographie disponible pour le moment.</p>
+{% endif %}
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-4">Retour à l'accueil</a>
+{% endblock %}

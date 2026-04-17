@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Télescopes - Site Astronomie{% endblock %}
+
+{% block content %}
+<h2>🔭 Télescopes</h2>
+<p>Découvrez notre sélection de télescopes, classés par catégorie.</p>
+
+{% for category, telescopes in telescopes_by_category.items() %}
+    <h3 class="mt-4">{{ category }}</h3>
+    {% if telescopes %}
+        <div class="row">
+            {% for telescope in telescopes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ telescope.brand }} {{ telescope.model }}</h5>
+                            <p class="card-text">
+                                <strong>Date de sortie :</strong> {{ telescope.release_date.strftime('%d/%m/%Y') }}<br>
+                                <strong>Score :</strong> 
+                                {% for i in range(telescope.score) %}⭐{% endfor %} 
+                                ({{ telescope.score }}/5)
+                            </p>
+                            {% if telescope.description %}
+                                <p class="card-text text-muted">{{ telescope.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('telescope_detail', telescope_id=telescope.id) }}" class="btn btn-sm btn-primary">Voir détails</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Aucun télescope dans cette catégorie pour le moment.</p>
+    {% endif %}
+{% endfor %}
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-4">Retour à l'accueil</a>
+{% endblock %}

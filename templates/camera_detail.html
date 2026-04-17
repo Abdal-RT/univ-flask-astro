@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Détail - Appareil Photo{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg">
+    <div class="card-body">
+        <h2>{{ camera.brand }} {{ camera.model }}</h2>
+        <p><strong>Catégorie :</strong> {{ camera.category }}</p>
+        <p><strong>Date de sortie :</strong> {{ camera.release_date.strftime('%d/%m/%Y') }}</p>
+        <p><strong>Score :</strong> 
+            {% for i in range(camera.score) %}⭐{% endfor %} 
+            ({{ camera.score }}/5)
+        </p>
+        {% if camera.description %}
+            <p><strong>Description :</strong></p>
+            <p>{{ camera.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('cameras') }}" class="btn btn-primary">Retour aux appareils photo</a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Accueil</a>
+</div>
+{% endblock %}

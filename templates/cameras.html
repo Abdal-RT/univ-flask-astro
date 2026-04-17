@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Appareils Photo - Site Astronomie{% endblock %}
+
+{% block content %}
+<h2>📷 Appareils Photo</h2>
+<p>Découvrez notre sélection d'appareils photo pour l'astronomie, classés par catégorie.</p>
+
+{% for category, cameras in cameras_by_category.items() %}
+    <h3 class="mt-4">{{ category }}</h3>
+    {% if cameras %}
+        <div class="row">
+            {% for camera in cameras %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ camera.brand }} {{ camera.model }}</h5>
+                            <p class="card-text">
+                                <strong>Date de sortie :</strong> {{ camera.release_date.strftime('%d/%m/%Y') }}<br>
+                                <strong>Score :</strong> 
+                                {% for i in range(camera.score) %}⭐{% endfor %} 
+                                ({{ camera.score }}/5)
+                            </p>
+                            {% if camera.description %}
+                                <p class="card-text text-muted">{{ camera.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" class="btn btn-sm btn-primary">Voir détails</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Aucun appareil photo dans cette catégorie pour le moment.</p>
+    {% endif %}
+{% endfor %}
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-4">Retour à l'accueil</a>
+{% endblock %}

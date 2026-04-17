@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Site Astronomie{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">🔭 Bienvenue sur le Site Communautaire d'Astronomie</h1>
+    <p class="lead">Explorez l'univers avec nous !</p>
+    <hr class="my-4">
+    <p>Découvrez les meilleurs appareils photo, télescopes et photographies astronomiques.</p>
+    {% if not current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}" role="button">S'inscrire</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('login') }}" role="button">Se connecter</a>
+    {% else %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('cameras') }}" role="button">Voir les appareils photo</a>
+        <a class="btn btn-info btn-lg" href="{{ url_for('telescopes') }}" role="button">Voir les télescopes</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 text-center">
+        <h3>📷 Appareils Photo</h3>
+        <p>Découvrez nos appareils photo pour l'astronomie.</p>
+        <a href="{{ url_for('cameras') }}" class="btn btn-outline-primary">Voir plus</a>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>🔭 Télescopes</h3>
+        <p>Explorer notre sélection de télescopes de qualité.</p>
+        <a href="{{ url_for('telescopes') }}" class="btn btn-outline-primary">Voir plus</a>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>🌌 Photographies</h3>
+        <p>Admirez les plus belles photographies astronomiques.</p>
+        <a href="{{ url_for('photos') }}" class="btn btn-outline-primary">Voir plus</a>
+    </div>
+</div>
+{% endblock %}
