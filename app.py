@@ -1,16 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_bootstrap import Bootstrap
+from datetime import datetime
+import os
+
 from config import Config
 from models import db, User, Camera, Telescope, Photograph
-from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Initialisation des extensions
+# Initialisation de SQLAlchemy
 db.init_app(app)
-Bootstrap(app)
 
 # Configuration LoginManager
 login_manager = LoginManager()
@@ -91,6 +91,10 @@ def logout():
     return redirect(url_for('index'))
 
 
+# ============= DONNÉES STATIQUES =============
+# (Plus utilisées - remplacées par BD)
+
+
 # ============= ROUTES PRINCIPALES =============
 
 @app.route('/')
@@ -167,7 +171,6 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_error(e):
     """Gérer les erreurs serveur"""
-    db.session.rollback()
     return render_template('500.html'), 500
 
 
@@ -177,7 +180,7 @@ def internal_error(e):
 def init_db():
     """Initialiser la base de données"""
     db.create_all()
-    print('Base de données initialisée.')
+    print('✅ Base de données initialisée.')
 
 
 @app.cli.command()
@@ -185,47 +188,101 @@ def seed_db():
     """Remplir la base de données avec des données de test"""
     # Vérifier si les données existent déjà
     if Camera.query.first():
-        print('La base de données contient déjà des données.')
+        print('⚠️  La base de données contient déjà des données.')
         return
     
     # Ajouter des appareils photos
     cameras = [
-        Camera(brand='Canon', model='EOS Rebel T100', release_date=datetime(2020, 1, 1).date(), 
-               score=4, category='Amateur', description='Appareil photo reflex bien abordable'),
-        Camera(brand='Nikon', model='D3400', release_date=datetime(2021, 6, 15).date(), 
-               score=4, category='Amateur', description='Excellent pour débuter'),
-        Camera(brand='Sony', model='A6000', release_date=datetime(2019, 3, 20).date(), 
-               score=5, category='Amateur sérieux', description='Hybride très polyvalent'),
-        Camera(brand='Canon', model='EOS R5', release_date=datetime(2020, 7, 30).date(), 
-               score=5, category='Professionnel', description='Appareil phare pour les professionnels'),
+        Camera(
+            brand='Canon', 
+            model='EOS Rebel T100', 
+            release_date=datetime(2020, 1, 1).date(), 
+            score=4, 
+            category='Amateur', 
+            description='Appareil photo reflex bien abordable'
+        ),
+        Camera(
+            brand='Nikon', 
+            model='D3400', 
+            release_date=datetime(2021, 6, 15).date(), 
+            score=4, 
+            category='Amateur', 
+            description='Excellent pour débuter'
+        ),
+        Camera(
+            brand='Sony', 
+            model='A6000', 
+            release_date=datetime(2019, 3, 20).date(), 
+            score=5, 
+            category='Amateur sérieux', 
+            description='Hybride très polyvalent'
+        ),
+        Camera(
+            brand='Canon', 
+            model='EOS R5', 
+            release_date=datetime(2020, 7, 30).date(), 
+            score=5, 
+            category='Professionnel', 
+            description='Appareil phare pour les professionnels'
+        ),
     ]
     
     # Ajouter des télescopes
     telescopes = [
-        Telescope(brand='Celestron', model='StarPointer', release_date=datetime(2019, 1, 1).date(), 
-                 score=4, category='Pour enfants', description='Télescope idéal pour débuter'),
-        Telescope(brand='Meade', model='EclipseView', release_date=datetime(2020, 5, 10).date(), 
-                 score=3, category='Pour enfants', description='Parfait pour les enfants'),
-        Telescope(brand='Celestron', model='Nexstar 8SE', release_date=datetime(2021, 2, 20).date(), 
-                 score=5, category='Automatisés', description='Télescope automatisé très précis'),
-        Telescope(brand='Meade', model='LX90', release_date=datetime(2018, 8, 15).date(), 
-                 score=5, category='Complets', description='Solution complète pour l\'astronomie'),
+        Telescope(
+            brand='Celestron', 
+            model='StarPointer', 
+            release_date=datetime(2019, 1, 1).date(), 
+            score=4, 
+            category='Pour enfants', 
+            description='Télescope idéal pour débuter'
+        ),
+        Telescope(
+            brand='Meade', 
+            model='EclipseView', 
+            release_date=datetime(2020, 5, 10).date(), 
+            score=3, 
+            category='Pour enfants', 
+            description='Parfait pour les enfants'
+        ),
+        Telescope(
+            brand='Celestron', 
+            model='Nexstar 8SE', 
+            release_date=datetime(2021, 2, 20).date(), 
+            score=5, 
+            category='Automatisés', 
+            description='Télescope automatisé très précis'
+        ),
+        Telescope(
+            brand='Meade', 
+            model='LX90', 
+            release_date=datetime(2018, 8, 15).date(), 
+            score=5, 
+            category='Complets', 
+            description='Solution complète pour l\'astronomie'
+        ),
     ]
     
     # Ajouter des photographies
-    photos = [
-        Photograph(title='La Lune', description='Photo de la Lune en haute résolution',
-                  image_path='/static/images/moon.jpg'),
-        Photograph(title='Voie Lactée', description='Voie Lactée photographiée depuis les Alpes',
-                  image_path='/static/images/milkyway.jpg'),
+    photographs = [
+        Photograph(
+            title='La Lune', 
+            description='Photo de la Lune en haute résolution',
+            image_path='/static/images/moon.jpg'
+        ),
+        Photograph(
+            title='Voie Lactée', 
+            description='Voie Lactée photographiée depuis les Alpes',
+            image_path='/static/images/milkyway.jpg'
+        ),
     ]
     
-    db.session.add_all(cameras + telescopes + photos)
+    db.session.add_all(cameras + telescopes + photographs)
     db.session.commit()
-    print('Base de données remplie avec les données de test.')
+    print('✅ Base de données remplie avec les données de test.')
 
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

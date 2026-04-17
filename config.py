@@ -4,8 +4,8 @@ class Config:
     """Configuration de base pour l'application Flask"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # Configuration MySQL
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/astronomy_db'
+    # Configuration MySQL via socket Unix (Pour Debian/Ubuntu)
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@/astronomy_db?unix_socket=/run/mysqld/mysqld.sock'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuration de session

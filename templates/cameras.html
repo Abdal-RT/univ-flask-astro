@@ -16,7 +16,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ camera.brand }} {{ camera.model }}</h5>
                             <p class="card-text">
-                                <strong>Date de sortie :</strong> {{ camera.release_date.strftime('%d/%m/%Y') }}<br>
+                                <strong>Date de sortie :</strong> {{ camera.release_date }}<br>
                                 <strong>Score :</strong> 
                                 {% for i in range(camera.score) %}⭐{% endfor %} 
                                 ({{ camera.score }}/5)

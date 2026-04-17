@@ -17,11 +17,9 @@
                             <p class="card-text">{{ photo.description }}</p>
                         {% endif %}
                         <p class="text-muted small">
-                            {% if photo.user %}
-                                Par {{ photo.user.username }}
+                            {% if photo.author %}
+                                Par {{ photo.author }}
                             {% endif %}
-                            <br>
-                            {{ photo.created_at.strftime('%d/%m/%Y') }}
                         </p>
                     </div>
                 </div>

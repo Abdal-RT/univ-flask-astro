@@ -16,7 +16,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ telescope.brand }} {{ telescope.model }}</h5>
                             <p class="card-text">
-                                <strong>Date de sortie :</strong> {{ telescope.release_date.strftime('%d/%m/%Y') }}<br>
+                                <strong>Date de sortie :</strong> {{ telescope.release_date }}<br>
                                 <strong>Score :</strong> 
                                 {% for i in range(telescope.score) %}⭐{% endfor %} 
                                 ({{ telescope.score }}/5)
