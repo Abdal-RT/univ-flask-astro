@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un nouveau fil - Forum{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg">
+    <div class="card-header">
+        <h2>Créer un nouveau fil de discussion</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Titre du fil</label>
+                <input type="text" class="form-control" id="title" name="title" required placeholder="Ex: Question sur les cameras reflex">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Catégorie</label>
+                <select class="form-control" id="category" name="category" required>
+                    <option value="">Sélectionner une catégorie</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description / Sujet</label>
+                <textarea class="form-control" id="description" name="description" rows="6" required placeholder="Décrivez votre sujet en détail..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Créer le fil</button>
+                <a href="{{ url_for('forum_index') }}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

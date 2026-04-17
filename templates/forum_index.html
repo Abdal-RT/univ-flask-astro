@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Forum - Site Astronomie{% endblock %}
+
+{% block content %}
+<h2>💬 Forum de Discussion</h2>
+<p>Échangez avec la communauté sur l'astronomie, les appareils photos et les télescopes.</p>
+
+{% if current_user.is_authenticated %}
+<div class="mb-4">
+    <a href="{{ url_for('create_forum_thread') }}" class="btn btn-primary">✚ Créer un nouveau fil</a>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <a href="{{ url_for('login') }}">Se connecter</a> pour participer au forum.
+</div>
+{% endif %}
+
+{% if threads %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Sujet</th>
+                    <th>Catégorie</th>
+                    <th style="width: 150px;">Auteur</th>
+                    <th style="width: 80px;">Réponses</th>
+                    <th style="width: 150px;">Dernier message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for thread in threads %}
+                    <tr>
+                        <td>
+                            {% if thread.is_pinned %}
+                                <span class="badge badge-warning">📌 Épinglé</span>
+                            {% endif %}
+                            <a href="{{ url_for('forum_thread_detail', thread_id=thread.id) }}" class="text-primary font-weight-bold">
+                                {{ thread.title }}
+                            </a>
+                            {% if thread.is_locked %}
+                                <span class="badge badge-danger">🔒 Verrouillé</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('forum_category', category=thread.category) }}" class="category-badge">
+                                {{ thread.category }}
+                            </a>
+                        </td>
+                        <td>{{ thread.author.username }}</td>
+                        <td>{{ thread.get_post_count() }}</td>
+                        <td>
+                            {% set last_post = thread.get_last_post() %}
+                            {% if last_post %}
+                                {{ last_post.created_at.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-muted">Aucun fil de discussion pour le moment.</p>
+{% endif %}
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-4">Retour à l'accueil</a>
+{% endblock %}

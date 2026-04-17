@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ thread.title }} - Forum{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg mb-4">
+    <div class="card-header">
+        <h2>{{ thread.title }}</h2>
+        <div class="text-muted small">
+            <p>
+                Par <strong>{{ thread.author.username }}</strong> | 
+                Catégorie: <span class="category-badge">{{ thread.category }}</span> | 
+                {{ thread.created_at.strftime('%d/%m/%Y à %H:%M') }}
+            </p>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>{{ thread.description }}</p>
+    </div>
+</div>
+
+<!-- Messages -->
+<h3>Réponses ({{ posts|length }})</h3>
+<div class="mb-4">
+    {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ post.author.username }}</strong>
+                    <small class="text-muted">{{ post.created_at.strftime('%d/%m/%Y à %H:%M') }}</small>
+                </div>
+                {% if post.is_solution %}
+                    <span class="badge badge-success">✓ Solution</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {{ post.content }}
+            </div>
+            <div class="card-footer">
+                <small>
+                    ❤️ {{ post.likes_count }} like{{ 's' if post.likes_count > 1 else '' }}
+                </small>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucune réponse pour le moment.</p>
+    {% endfor %}
+</div>
+
+<!-- Formulaire de réponse -->
+{% if current_user.is_authenticated and not thread.is_locked %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h4>Ajouter une réponse</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('create_forum_post', thread_id=thread.id) }}">
+            <div class="form-group">
+                <label for="content">Votre réponse</label>
+                <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+    </div>
+</div>
+{% elif thread.is_locked %}
+    <div class="alert alert-warning">
+        Ce fil est verrouillé. Aucune nouvelle réponse ne peut être ajoutée.
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <a href="{{ url_for('login') }}">Se connecter</a> pour répondre à ce fil.
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{{ url_for('forum_index') }}" class="btn btn-primary">← Retour au forum</a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Accueil</a>
+</div>
+{% endblock %}

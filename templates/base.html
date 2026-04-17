@@ -21,13 +21,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cameras') }}">Appareils Photo</a>
+                        <a class="nav-link" href="{{ url_for('cameras') }}">📷 Appareils Photo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('telescopes') }}">Télescopes</a>
+                        <a class="nav-link" href="{{ url_for('telescopes') }}">🔭 Télescopes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('photos') }}">Photographies</a>
+                        <a class="nav-link" href="{{ url_for('photos') }}">🌌 Photographies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('news_list') }}">📰 Actualités</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('forum_index') }}">💬 Forum</a>
                     </li>
                     <li class="nav-item">
                         {% if current_user.is_authenticated %}

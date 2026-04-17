@@ -11,16 +11,18 @@
         {% for photo in photographs %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
+                    {% if photo.image_path %}
+                        <img src="{{ photo.image_path }}" class="card-img-top" alt="{{ photo.title }}" style="height: 250px; object-fit: cover;">
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ photo.title }}</h5>
                         {% if photo.description %}
                             <p class="card-text">{{ photo.description }}</p>
                         {% endif %}
-                        <p class="text-muted small">
-                            {% if photo.author %}
-                                Par {{ photo.author }}
-                            {% endif %}
-                        </p>
+                        {% if photo.user %}
+                            <p class="text-muted small">Par {{ photo.user.username }}</p>
+                        {% endif %}
+                        <p class="text-muted small">{{ photo.created_at.strftime('%d/%m/%Y') }}</p>
                     </div>
                 </div>
             </div>

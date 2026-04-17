@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ news.title }} - Actualités{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg mb-4">
+    {% if news.image_path %}
+        <img src="{{ news.image_path }}" class="card-img-top" alt="{{ news.title }}" style="max-height: 400px; object-fit: cover;">
+    {% endif %}
+    <div class="card-body">
+        <h2>{{ news.title }}</h2>
+        <div class="mb-3">
+            <p class="text-muted">
+                <strong>Par:</strong> {{ news.author.username }} | 
+                <strong>Publié:</strong> {{ news.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                {% if news.updated_at != news.created_at %}
+                    | <strong>Modifié:</strong> {{ news.updated_at.strftime('%d/%m/%Y à %H:%M') }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="article-content">
+            {{ news.content }}
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('news_list') }}" class="btn btn-primary">← Retour aux actualités</a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Accueil</a>
+</div>
+{% endblock %}

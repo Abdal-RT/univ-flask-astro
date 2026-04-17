@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 
 from config import Config
-from models import db, User, Camera, Telescope, Photograph
+from models import db, User, Camera, Telescope, Photograph, News, ForumThread, ForumPost
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -158,6 +158,121 @@ def photos():
     """Page listant toutes les photographies"""
     photographs = Photograph.query.all()
     return render_template('photos.html', photographs=photographs)
+
+
+# ============= ROUTES ACTUALITÉS =============
+
+@app.route('/news')
+def news_list():
+    """Page listant les actualités"""
+    news = News.query.filter_by(is_published=True).order_by(News.created_at.desc()).all()
+    return render_template('news_list.html', news=news)
+
+
+@app.route('/news/<int:news_id>')
+def news_detail(news_id):
+    """Page de détail d'une actualité"""
+    news = News.query.get_or_404(news_id)
+    if not news.is_published and (not current_user or current_user.id != news.author_id):
+        return render_template('404.html'), 404
+    return render_template('news_detail.html', news=news)
+
+
+@app.route('/news/create', methods=['GET', 'POST'])
+@login_required
+def create_news():
+    """Créer une nouvelle actualité (admin uniquement)"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        is_published = request.form.get('is_published') == 'on'
+        
+        if not title or not content:
+            flash('Le titre et le contenu sont requis.', 'danger')
+            return redirect(url_for('create_news'))
+        
+        news = News(title=title, content=content, author_id=current_user.id, is_published=is_published)
+        db.session.add(news)
+        db.session.commit()
+        
+        flash('Actualité créée avec succès !', 'success')
+        return redirect(url_for('news_detail', news_id=news.id))
+    
+    return render_template('create_news.html')
+
+
+# ============= ROUTES FORUM =============
+
+@app.route('/forum')
+def forum_index():
+    """Page principale du forum"""
+    threads = ForumThread.query.order_by(ForumThread.is_pinned.desc(), ForumThread.updated_at.desc()).all()
+    categories = ['Appareil photo', 'Télescope', 'Astrophotographie', 'Général']
+    return render_template('forum_index.html', threads=threads, categories=categories)
+
+
+@app.route('/forum/category/<category>')
+def forum_category(category):
+    """Voir tous les threads d'une catégorie"""
+    threads = ForumThread.query.filter_by(category=category).order_by(ForumThread.is_pinned.desc(), ForumThread.updated_at.desc()).all()
+    return render_template('forum_category.html', category=category, threads=threads)
+
+
+@app.route('/forum/thread/<int:thread_id>')
+def forum_thread_detail(thread_id):
+    """Voir un fil de discussion avec tous ses messages"""
+    thread = ForumThread.query.get_or_404(thread_id)
+    posts = ForumPost.query.filter_by(thread_id=thread_id).order_by(ForumPost.created_at.asc()).all()
+    return render_template('forum_thread.html', thread=thread, posts=posts)
+
+
+@app.route('/forum/thread/create', methods=['GET', 'POST'])
+@login_required
+def create_forum_thread():
+    """Créer un nouveau fil de discussion"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        category = request.form.get('category')
+        description = request.form.get('description')
+        
+        if not title or not category or not description:
+            flash('Tous les champs sont requis.', 'danger')
+            return redirect(url_for('create_forum_thread'))
+        
+        thread = ForumThread(title=title, category=category, description=description, author_id=current_user.id)
+        db.session.add(thread)
+        db.session.commit()
+        
+        flash('Fil de discussion créé avec succès !', 'success')
+        return redirect(url_for('forum_thread_detail', thread_id=thread.id))
+    
+    categories = ['Appareil photo', 'Télescope', 'Astrophotographie', 'Général']
+    return render_template('create_forum_thread.html', categories=categories)
+
+
+@app.route('/forum/thread/<int:thread_id>/post', methods=['POST'])
+@login_required
+def create_forum_post(thread_id):
+    """Ajouter un message dans un fil de discussion"""
+    thread = ForumThread.query.get_or_404(thread_id)
+    
+    if thread.is_locked:
+        flash('Ce fil est verrouillé et ne peut plus recevoir de réponses.', 'danger')
+        return redirect(url_for('forum_thread_detail', thread_id=thread_id))
+    
+    content = request.form.get('content')
+    
+    if not content:
+        flash('Le message ne peut pas être vide.', 'danger')
+        return redirect(url_for('forum_thread_detail', thread_id=thread_id))
+    
+    post = ForumPost(content=content, author_id=current_user.id, thread_id=thread_id)
+    db.session.add(post)
+    thread.updated_at = datetime.utcnow()
+    db.session.commit()
+    
+    flash('Message posté avec succès !', 'success')
+    return redirect(url_for('forum_thread_detail', thread_id=thread_id))
 
 
 # ============= GESTION DES ERREURS =============

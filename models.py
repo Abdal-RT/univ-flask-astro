@@ -87,3 +87,70 @@ class Photograph(db.Model):
     
     def __repr__(self):
         return f'<Photograph {self.title}>'
+
+
+class News(db.Model):
+    """Modèle pour les actualités"""
+    __tablename__ = 'news'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image_path = db.Column(db.String(255), nullable=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    is_published = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    author = db.relationship('User', backref='news_articles')
+    
+    def __repr__(self):
+        return f'<News {self.title}>'
+
+
+class ForumThread(db.Model):
+    """Modèle pour les fils de discussion"""
+    __tablename__ = 'forum_threads'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(50), nullable=False)  # Appareil photo, Télescope, Astrophotographie, Général
+    description = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    is_locked = db.Column(db.Boolean, default=False)
+    is_pinned = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    author = db.relationship('User', backref='forum_threads')
+    posts = db.relationship('ForumPost', backref='thread', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<ForumThread {self.title}>'
+    
+    def get_post_count(self):
+        return len(self.posts)
+    
+    def get_last_post(self):
+        if self.posts:
+            return sorted(self.posts, key=lambda p: p.created_at)[-1]
+        return None
+
+
+class ForumPost(db.Model):
+    """Modèle pour les messages du forum"""
+    __tablename__ = 'forum_posts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    thread_id = db.Column(db.Integer, db.ForeignKey('forum_threads.id'), nullable=False)
+    likes_count = db.Column(db.Integer, default=0)
+    is_solution = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    author = db.relationship('User', backref='forum_posts')
+    
+    def __repr__(self):
+        return f'<ForumPost by {self.author.username}>'
